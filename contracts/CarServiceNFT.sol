@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CarHistoryNFT is ERC721URIStorage, Ownable {
-    // Структура записи об обслуживании
     struct ServiceRecord {
         uint256 timestamp;
         string description;
@@ -13,21 +12,17 @@ contract CarHistoryNFT is ERC721URIStorage, Ownable {
         string signature;
     }
 
-    // Маппинг для хранения записей обслуживания для каждого токена (NFT)
     mapping(uint256 => ServiceRecord[]) public serviceRecords;
 
-    // Событие для добавления новой записи
     event ServiceAdded(uint256 indexed tokenId, uint256 timestamp, string description, string company, string signature);
 
     constructor(address initialOwner) ERC721("CarHistoryNFT", "CHNFT") Ownable(initialOwner) {}
 
-    // Выпуск нового NFT
     function mintCar(address to, uint256 tokenId, string memory metadataURI) public onlyOwner {
         _safeMint(to, tokenId);
-        _setTokenURI(tokenId, metadataURI); // URI для базовой информации (если нужна)
+        _setTokenURI(tokenId, metadataURI);
     }
 
-    // Добавление записи об обслуживании
     function addServiceRecord(
         uint256 tokenId,
         string memory description,
@@ -36,7 +31,6 @@ contract CarHistoryNFT is ERC721URIStorage, Ownable {
     ) public {
         require(ownerOf(tokenId) == msg.sender, "Only the owner can add a service record");
 
-        // Добавляем запись в массив
         serviceRecords[tokenId].push(ServiceRecord({
             timestamp: block.timestamp,
             description: description,
@@ -47,7 +41,6 @@ contract CarHistoryNFT is ERC721URIStorage, Ownable {
         emit ServiceAdded(tokenId, block.timestamp, description, company, signature);
     }
 
-    // Получение всех записей об обслуживании
     function getServiceRecords(uint256 tokenId) public view returns (ServiceRecord[] memory) {
         return serviceRecords[tokenId];
     }
